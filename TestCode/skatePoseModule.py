@@ -31,6 +31,20 @@ class poseDetector:
 
         return angle
     
+    def findAngle3D2(self, p1, p2, p3):
+        ba = p1 - p2
+        bc = p3 - p2
+
+        v = np.array([ba,bc])
+        v=v/np.linalg.norm(v, axis=1)[:, np.newaxis]
+        angle=np.arccos(np.einsum('nt,nt->n',
+                         v[[0],:],
+                         v[[1],:]))
+
+        angle = np.degrees(angle)
+        
+        return angle    
+    
     def findLandmarks(self, cap):
         mp_pose = mp.solutions.pose
         mp_drawing = mp.solutions.drawing_utils 
@@ -46,6 +60,8 @@ class poseDetector:
 
         rightLegAngleList = []
         leftLegAngleList = []
+        rightArmAngleList = []
+        leftArmAngleList = []
         lmlist = []
         flag = 0
         
@@ -73,9 +89,6 @@ class poseDetector:
                 except:
                     pass
 
-        #         mp_drawing.plot_landmarks(
-        #         results.pose_world_landmarks, mp_pose.POSE_CONNECTIONS)
-
                 # Save landmarks
                 if results.pose_landmarks is not None:
                     mypose = results.pose_landmarks
@@ -86,8 +99,10 @@ class poseDetector:
                     lmlist.append(tmpList)
 
                     # Calc Leg Angles
-                    rightLegAngleList.append(self.findAngle3D(tmpList[23][1:],tmpList[25][1:],tmpList[27][1:]))
-                    leftLegAngleList.append(self.findAngle3D(tmpList[24][1:],tmpList[26][1:],tmpList[28][1:]))
+                    rightLegAngleList.append(self.findAngle3D(tmpList[24][1:],tmpList[26][1:],tmpList[28][1:]))
+                    leftLegAngleList.append(self.findAngle3D(tmpList[23][1:],tmpList[25][1:],tmpList[27][1:]))
+                    rightArmAngleList.append(self.findAngle3D(tmpList[12][1:],tmpList[14][1:],tmpList[16][1:]))
+                    leftArmAngleList.append(self.findAngle3D(tmpList[11][1:],tmpList[13][1:],tmpList[15][1:]))
 
                 # Render detections
                 mp_drawing.draw_landmarks(image, results.pose_landmarks, mp_pose.POSE_CONNECTIONS,
@@ -109,4 +124,4 @@ class poseDetector:
             cap.release()
             cv2.destroyAllWindows()
             
-            return lmlist, rightLegAngleList, leftLegAngleList
+            return lmlist, rightLegAngleList, leftLegAngleList, rightArmAngleList, leftArmAngleList
