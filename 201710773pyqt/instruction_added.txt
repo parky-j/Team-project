@@ -1,0 +1,44 @@
+class MyWindow(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setupUI()
+
+    def setupUI(self):
+        self.setGeometry(600, 200, 1200, 600)
+        self.setWindowTitle("PyChart Viewer v0.1")
+        self.setWindowIcon(QIcon('icon.png'))
+
+        self.lineEdit = QLineEdit()
+        self.lineEdit.setText("%d 회"%0)
+        self.pushButton = QPushButton("영상선택")
+        self.pushButton.clicked.connect(self.pushButtonClicked)
+        self.label = QLabel()
+        self.label.setText("""
+1. 영상 선택
+
+2. 측정할 인원 드래그
+
+3. Enter
+
+4. 종료 단축키 Q""")
+
+        self.fig = plt.Figure()
+        self.canvas = FigureCanvas(self.fig)
+
+        leftLayout = QVBoxLayout()
+        leftLayout.addWidget(self.canvas)
+
+        # Right Layout
+        rightLayout = QVBoxLayout()
+        rightLayout.addWidget(self.lineEdit)
+        rightLayout.addWidget(self.pushButton)
+        rightLayout.addWidget(self.label)
+        rightLayout.addStretch(1)
+
+        layout = QHBoxLayout()
+        layout.addLayout(leftLayout)
+        layout.addLayout(rightLayout)
+        layout.setStretchFactor(leftLayout, 1)
+        layout.setStretchFactor(rightLayout, 0)
+
+        self.setLayout(layout)
